@@ -13,11 +13,19 @@ class _HomeAdminState extends State<HomeAdmin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        
+        centerTitle: true,
+        title: Text(
+          "Home Admin",
+          style:AppWidget.semiBoldWhiteTextFeildStyle(), 
+        ),
+        backgroundColor: Colors.black,
+      ),
       body: Container(
         margin: EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
         child: Column(
           children: [
-            Center(child: Text("Home Admin", style: AppWidget.HeadlineTextFeildStyle(),),),
             SizedBox(height: 50.0,),
             GestureDetector(
               onTap: (){

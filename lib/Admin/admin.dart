@@ -1,7 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:foody_admin_app/Admin/admin_home.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:foody_admin_app/Admin/admin_signup.dart';
+import 'package:foody_admin_app/widget/widget_support.dart';
 
 class AdminLogin extends StatefulWidget {
   const AdminLogin({super.key});
@@ -12,9 +13,33 @@ class AdminLogin extends StatefulWidget {
 
 class _AdminLoginState extends State<AdminLogin> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  TextEditingController usernamecontroller = new TextEditingController();
-  TextEditingController userpasswordcontroller = new TextEditingController();
+  TextEditingController useremailcontroller = TextEditingController();
+  TextEditingController userpasswordcontroller = TextEditingController();
+  String email = "";
+  String password = "";
 
+ userLogin() async {
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomeAdmin()));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+          "No User Found for that Email",
+          style: TextStyle(fontSize: 18.0, color: Colors.black),
+        )));
+      } else if (e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+          "Wrong Password Provided by User",
+          style: TextStyle(fontSize: 18.0, color: Colors.black),
+        )));
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +90,7 @@ class _AdminLoginState extends State<AdminLogin> {
                           child: Column(
                             children: [
                               SizedBox(
-                                height: 50.0,
+                                height: 20.0,
                               ),
                               Container(
                                 padding: EdgeInsets.only(
@@ -73,20 +98,19 @@ class _AdminLoginState extends State<AdminLogin> {
                                 margin: EdgeInsets.symmetric(horizontal: 20.0),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                        color:
-                                            Color.fromARGB(255, 160, 160, 147)),
+                                        color: Color.fromARGB(255, 160, 160, 147)),
                                     borderRadius: BorderRadius.circular(10)),
                                 child: Center(
                                   child: TextFormField(
-                                    controller: usernamecontroller,
+                                    controller: useremailcontroller,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
-                                        return 'Please Enter Username';
+                                        return 'Please Enter Email';
                                       }
                                     },
                                     decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        hintText: "Username",
+                                        hintText: "Email",
                                         hintStyle: TextStyle(
                                             color: Color.fromARGB(
                                                 255, 160, 160, 147))),
@@ -94,7 +118,7 @@ class _AdminLoginState extends State<AdminLogin> {
                                 ),
                               ),
                               SizedBox(
-                                height: 40.0,
+                                height: 10.0,
                               ),
                               Container(
                                 padding: EdgeInsets.only(
@@ -102,8 +126,7 @@ class _AdminLoginState extends State<AdminLogin> {
                                 margin: EdgeInsets.symmetric(horizontal: 20.0),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                        color:
-                                            Color.fromARGB(255, 160, 160, 147)),
+                                        color: Color.fromARGB(255, 160, 160, 147)),
                                     borderRadius: BorderRadius.circular(10)),
                                 child: Center(
                                   child: TextFormField(
@@ -123,11 +146,17 @@ class _AdminLoginState extends State<AdminLogin> {
                                 ),
                               ),
                               SizedBox(
-                                height: 40.0,
+                                height: 10.0,
                               ),
                               GestureDetector(
-                                onTap: (){
-                                  LoginAdmin();
+                                onTap: () {
+                                  setState(() {
+                                    email = useremailcontroller.text;
+                                    password = userpasswordcontroller.text;
+                                  });
+                                  if (_formkey.currentState!.validate()) {
+                                    userLogin();
+                                  }
                                 },
                                 child: Container(
                                   padding: EdgeInsets.symmetric(vertical: 12.0),
@@ -138,13 +167,26 @@ class _AdminLoginState extends State<AdminLogin> {
                                       borderRadius: BorderRadius.circular(10)),
                                   child: Center(
                                     child: Text(
-                                      "LogIn",
+                                      "Log In",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
+                                ),
+                              ),
+                              SizedBox(height: 30),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => AdminSignUp()));
+                                },
+                                child: Text(
+                                  "Don't have an account? Sign up",
+                                  style: AppWidget.semiBoldTextFeildStyle(),
                                 ),
                               )
                             ],
@@ -158,31 +200,5 @@ class _AdminLoginState extends State<AdminLogin> {
         ),
       ),
     );
-  }
-
-  LoginAdmin() {
-    FirebaseFirestore.instance.collection("Admin").get().then((snapshot) {
-      snapshot.docs.forEach((result) {
-        if (result.data()['id'] != usernamecontroller.text.trim()) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.orangeAccent,
-              content: Text(
-                "Your id is not correct",
-                style: TextStyle(fontSize: 18.0),
-              )));
-        } else if (result.data()['password'] !=
-            userpasswordcontroller.text.trim()) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.orangeAccent,
-              content: Text(
-                "Your password is not correct",
-                style: TextStyle(fontSize: 18.0),
-              )));
-        } else {
-          Route route = MaterialPageRoute(builder: (context) => HomeAdmin());
-          Navigator.pushReplacement(context, route);
-        }
-      });
-    });
   }
 }
