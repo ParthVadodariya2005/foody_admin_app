@@ -93,7 +93,7 @@ class _AddFoodState extends State<AddFood> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: GestureDetector(
+         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
@@ -110,6 +110,7 @@ class _AddFoodState extends State<AddFood> {
         ),
         backgroundColor: Colors.black,
       ),
+      
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.all(20.0),
@@ -174,7 +175,7 @@ class _AddFoodState extends State<AddFood> {
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Color(0xFFececf8),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextField(
@@ -195,7 +196,7 @@ class _AddFoodState extends State<AddFood> {
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Color(0xFFececf8),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextField(
