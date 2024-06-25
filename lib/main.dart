@@ -44,6 +44,7 @@ class AuthCheck extends StatelessWidget {
           return const AdminLogin(); // Redirect to the login page if the user is not logged in
         }
       },
+
     );
   }
 }
